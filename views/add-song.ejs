@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Song listing DeltaX Task</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+      integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@jarstone/dselect/dist/css/dselect.css"
+    />
+    <script src="https://unpkg.com/@jarstone/dselect/dist/js/dselect.js"></script>
+  </head>
+  <body>
+      <!-- Modal -->
+    <div class="modal fade" id="addartistModal" tabindex="-1" aria-labelledby="addartistModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="addartistModalLabel">Add Artist</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form >
+                    <div class="mb-3">
+                      <label for="artist_name" class="form-label">Name</label>
+                      <input type="text" class="form-control" id="artist_name" aria-describedby="artistname">
+                    </div>
+                    <div class="mb-3">
+                        <label for="artist_dob" class="form-label">Date of Birth</label>
+                        <input type="date" class="form-control" id="artist_dob" aria-describedby="artistdob">
+                      </div>
+                      <div class="mb-3">
+                        <label for="artist_bio" class="form-label">Bio</label>
+                        <textarea class="form-control" placeholder="Write artist's bio here" id="artist_bio" maxlength="250"></textarea>
+                        <div id="the-count">
+                            <span id="current">0</span>
+                            <span id="maximum">/ 250</span>
+                          </div>
+                      </div>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" id="artist_submit_btn" class="btn btn-primary">Submit</button>
+            </div>
+        </form>
+        </div>
+        </div>
+    </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container">
+        <a class="navbar-brand" href="#"><strong>DeltaX Music List</strong> </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNavAltMarkup"
+          aria-controls="navbarNavAltMarkup"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav ms-auto">
+            <a class="nav-link active" aria-current="page" href="#">Home</a>
+            <a class="nav-link" href="#">Songs</a>
+            <a class="nav-link" href="#">Artists</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div class="container mt-3">
+      <div class="row">
+        <div class="col-2">
+            <a href="/" class="btn btn-outline-secondary">Top 10 Songs</a>
+        </div>
+        <div class="col-2">
+            <a href="/" class="btn btn-outline-secondary">Top 10 Artists</a>
+        </div>
+        <div class="col-2 ms-auto">
+          <a href="/add_song" class="btn btn-primary"><i class="fa-regular fa-square-plus"></i> Add song</a>
+        </div>
+      </div>
+    </div>
+    <div class="row container mt-5">
+        <div class="col col-2">
+
+        </div>
+      <div class="col-4 me-auto border p-2">
+        <div>
+          <h3>Add a new Song</h3>
+        </div>
+        <form class="mt-3" action="/add/song/poster" method="post" enctype="multipart/form-data">
+          <div class="mb-3">
+            <label for="song_name" class="form-label">Song Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="song_name"
+              name="song_name"
+              aria-describedby="songname"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="date_released" class="form-label">Release Date</label>
+            <input
+              type="date"
+              class="form-control"
+              id="date_released"
+              name="date_released"
+              aria-describedby="songname"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="formFile"  class="form-label" >Song Poster</label>
+            <input class="form-control" accept="image/png,image/jpeg, image/jpg" name="myImg" type="file" id="formFile" onchange="validateFileType()"/>
+          </div>
+          <div class="mb-3">
+              <div class="row">
+                <label for="artist_select" class="form-label">Artist</label>
+                <div class="col-8">
+                    
+                    <select
+                    class="form-select" 
+                    id="artist_select"
+                    name="artist_select"
+                    aria-label="multiple select example"
+                    Multiple
+                    >
+                    
+                    </select>
+                </div>
+                <div class="col-4">
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addartistModal"><i class="fa-regular fa-square-plus"></i> Add Artist</button>
+                </div>
+              </div>
+            
+          </div>
+          
+          <button type="submit" class="btn btn-primary" id="add_song_btn">Submit</button>
+        </form>
+      </div>
+      <div class="col-8"></div>
+    </div>
+    <script>
+        $(document).ready(function(){
+            function upload_excel_function(){
+                var fileSelect = document.getElementById('formFile');
+                // Get the files from the input
+                var files = fileSelect.files;
+
+                // Create a FormData object.
+                var formData = new FormData();
+
+                //Grab only one file since this script disallows multiple file uploads.
+                var file = files[0]; 
+                
+                formData.append('myImg', file, file.name);
+                // Set up the request.
+                var xhr = new XMLHttpRequest();
+
+                // Open the connection.
+                xhr.open('POST', '/add/song/poster', true);
+                xhr.onload = function () {
+                if (xhr.status === 200) {
+                    alert('Poster uploaded sucessfully')
+                   
+                } else {
+                    alert('An error occurred during the upload. Try again.');  
+                }
+                };
+
+                // Send the data.
+                xhr.send(formData);
+            }
+            
+        })
+        $(document).ready(function () {
+            $.ajax({
+                    url: "/get/artist",
+                    type: 'Get',
+                     success: function(data){
+                        var rows = data.result
+                        rows.forEach(element => {
+                            $('#artist_select').append('<option value="' + element.artist_id + '">' + element.artist_name + '</option>');
+                        });
+                        var select_box_element = document.querySelector('#artist_select');
+    
+                        dselect(select_box_element, {
+                            search: true,
+                            createable:true
+                        });
+                     }
+                })
+            
+            });
+
+        $('#artist_submit_btn').on('click', function(){
+            var name = $('#artist_name').val();
+            var dob = $('#artist_dob').val();
+            var bio = $('#artist_bio').val();
+            data = {
+                name: name,
+                dob: dob,
+                bio:bio
+            }
+            $.ajax({
+                    url: "/add/artist",
+                    type: 'Post',
+                    data: data,
+                     success: function(data){
+                        console.log(data)
+                     }
+                })
+        })
+        
+
+        function validateFileType(){
+        var fileName = document.getElementById("formFile").value;
+        var idxDot = fileName.lastIndexOf(".") + 1;
+        var extFile = fileName.substr(idxDot, fileName.length).toLowerCase();
+        if (extFile=="jpg" || extFile=="jpeg" || extFile=="png"){
+            //TO DO
+        }else{
+            alert("Only jpg/jpeg and png files are allowed!");
+        }   
+    }
+
+        $('textarea').keyup(function() {
+    
+    var characterCount = $(this).val().length,
+        current = $('#current'),
+        maximum = $('#maximum'),
+        theCount = $('#the-count');
+      
+    current.text(characterCount);
+   
+    
+    /*This isn't entirely necessary, just playin around*/
+    if (characterCount < 70) {
+      current.css('color', '#666');
+    }
+    if (characterCount > 70 && characterCount < 90) {
+      current.css('color', '#6d5555');
+    }
+    if (characterCount > 90 && characterCount < 100) {
+      current.css('color', '#793535');
+    }
+    if (characterCount > 100 && characterCount < 120) {
+      current.css('color', '#841c1c');
+    }
+    if (characterCount > 120 && characterCount < 139) {
+      current.css('color', '#8f0001');
+    }
+    
+    if (characterCount >= 140) {
+      maximum.css('color', '#8f0001');
+      current.css('color', '#8f0001');
+      theCount.css('font-weight','bold');
+    } else {
+      maximum.css('color','#666');
+      theCount.css('font-weight','normal');
+    }
+    
+        
+  });
+
+        
+        
+        
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
