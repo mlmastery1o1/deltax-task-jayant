@@ -60,8 +60,6 @@
                     <th>Cover</th>
                     <th>Name</th>
                     <th>Release Date</th>
-                    <th>Artists</th>
-                    <th>AVG Rating</th>
                     <th>Rating</th>
                     <th colspan="2">Actions</th>
                 </tr>
@@ -76,8 +74,8 @@
         $("body").on("click", "#editbtn", function(){
           var song_id = $(this).parents("tr").attr('data-id')
           var song_rating = $(this).parents("tr").attr('data-rating')  
-          $(this).parents("tr").find("td:eq(5)").html('<input class="form-control" type="number" max="5" min="0" name="edit_rating" value="'+song_rating+'">')
-          $(this).parents("tr").find("td:eq(6)").prepend("<button class='btn btn-info btn-sm btn-update'>Update</button> <button class='btn btn-danger btn-sm btn-cancel'>Cancel</button>")  
+          $(this).parents("tr").find("td:eq(3)").html('<input class="form-control" type="number" max="5" min="0" name="edit_rating" value="'+song_rating+'">')
+          $(this).parents("tr").find("td:eq(4)").prepend("<button class='btn btn-info btn-sm btn-update'>Update</button> <button class='btn btn-danger btn-sm btn-cancel'>Cancel</button>")  
           $(this).hide(); 
 
         })
@@ -85,7 +83,7 @@
                 var song_id = $(this).parents("tr").attr('data-id');  
                 var song_rating = $(this).parents("tr").attr('data-rating'); 
 
-                $(this).parents("tr").find("td:eq(5)").text(song_rating);  
+                $(this).parents("tr").find("td:eq(3)").text(song_rating);  
 
                 $(this).parents("tr").find("#editbtn").show();   
                 $(this).parents("tr").find(".btn-update").remove();  
@@ -97,7 +95,7 @@
                 var song_id = $(this).parents("tr").attr('data-id');  
                 var song_rating = $(this).parents("tr").find("input[name='edit_rating']").val();
 
-                $(this).parents("tr").find("td:eq(5)").text(song_rating);  
+                $(this).parents("tr").find("td:eq(3)").text(song_rating);  
 
                 $(this).parents("tr").attr('data-id', song_id);  
                 $(this).parents("tr").attr('data-rating', song_rating); 
@@ -129,12 +127,12 @@
                         rows.forEach((elem,index) => {
                             var img = "./public/uploads/" + elem.song_poster
                             if(rows2[index] === undefined){
-                              table.append("<tr data-id="+ elem.song_id+" data-rating="+0+"><td><img src="+ img+" alt="+2+" height="+80+"></td><td>"+ elem.song_name +"</td><td>"+ elem.song_release +"</td><td>"+ elem.artists +"</td><td>"+ elem.avgrating +"</td><td class='rating' id='rating_col'>"+0+"</td><td class='noExl'><button class='btn btn-warning btn-sm' id='editbtn' ><i class='fa fa-star'></i> Rate</button></td></tr>")
+                              table.append("<tr data-id="+ elem.song_id+" data-rating="+0+"><td><img src="+ img+" alt="+2+" height="+80+"></td><td>"+ elem.song_name +"</td><td>"+ elem.song_release +"</td><td class='rating' id='rating_col'>"+0+"</td><td class='noExl'><button class='btn btn-warning btn-sm' id='editbtn' ><i class='fa fa-star'></i> Rate</button></td></tr>")
                             }else{
                               if(elem.song_id === rows2[index].song_id){
-                              table.append("<tr data-id="+ elem.song_id+" data-rating="+elem.rating+"><td><img src="+ img+" alt="+2+" height="+80+"></td><td>"+ elem.song_name +"</td><td>"+ elem.song_release +"</td><td>"+ elem.artists +"</td><td>"+ elem.avgrating +"</td><td class='rating' id='rating_col'>"+rows2[index].rating+"</td><td class='noExl'><button class='btn btn-warning btn-sm' id='editbtn' ><i class='fa fa-star'></i> Rate</button></td></tr>")
+                              table.append("<tr data-id="+ elem.song_id+" data-rating="+elem.rating+"><td><img src="+ img+" alt="+2+" height="+80+"></td><td>"+ elem.song_name +"</td><td>"+ elem.song_release +"</td><td class='rating' id='rating_col'>"+rows2[index].rating+"</td><td class='noExl'><button class='btn btn-warning btn-sm' id='editbtn' ><i class='fa fa-star'></i> Rate</button></td></tr>")
                             }else{
-                              table.append("<tr data-id="+ elem.song_id+" data-rating="+0+"><td><img src="+ img+" alt="+2+" height="+80+"></td><td>"+ elem.song_name +"</td><td>"+ elem.song_release +"</td><td>"+ elem.artists +"</td><td>"+ elem.avgrating +"</td><td class='rating' id='rating_col'>"+0+"</td><td class='noExl'><button class='btn btn-warning btn-sm' id='editbtn' ><i class='fa fa-star'></i> Rate</button></td></tr>")
+                              table.append("<tr data-id="+ elem.song_id+" data-rating="+0+"><td><img src="+ img+" alt="+2+" height="+80+"></td><td>"+ elem.song_name +"</td><td>"+ elem.song_release +"</td><td class='rating' id='rating_col'>"+0+"</td><td class='noExl'><button class='btn btn-warning btn-sm' id='editbtn' ><i class='fa fa-star'></i> Rate</button></td></tr>")
                             }
                             }
                             

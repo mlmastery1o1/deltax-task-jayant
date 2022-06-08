@@ -55,7 +55,7 @@ app.get("/artist", (req,res, next)=>{
 
 app.get("/get/songs", (req,res, next)=>{
     var user_id = 2
-    var sql = "SELECT *,count(r.rating) , ROUND(AVG(r.rating),1) as avgrating FROM songs s JOIN ratings r ON s.song_id = r.song_id GROUP BY s.song_id;"
+    var sql = "SELECT * FROM songs;"
     var values = []
     con.query(sql, values, (err, rows)=>{
         if (err) throw err;
