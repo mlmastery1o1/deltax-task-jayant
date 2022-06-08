@@ -79,8 +79,8 @@
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
           <div class="navbar-nav ms-auto">
             <a class="nav-link active" aria-current="page" href="#">Home</a>
-            <a class="nav-link" href="#">Songs</a>
-            <a class="nav-link" href="#">Artists</a>
+            <a class="nav-link" href="/songs">Songs</a>
+            <a class="nav-link" href="/artist">Artists</a>
           </div>
         </div>
       </div>
@@ -139,7 +139,7 @@
                     <select
                     class="form-select" 
                     id="artist_select"
-                    name="artist_select"
+                    name="artist_select[]"
                     aria-label="multiple select example"
                     Multiple
                     >
@@ -225,7 +225,24 @@
                     type: 'Post',
                     data: data,
                      success: function(data){
-                        console.log(data)
+                      $.ajax({
+                          url: "/get/artist",
+                          type: 'Get',
+                          success: function(data){
+                              var rows = data.result
+                              $('#artist_select').find('option').remove().end()
+                              rows.forEach(element => {
+                                  $('#artist_select').append('<option value="' + element.artist_id + '">' + element.artist_name + '</option>');
+                              });
+                              var select_box_element = document.querySelector('#artist_select');
+          
+                              dselect(select_box_element, {
+                                  search: true,
+                                  createable:true
+                              });
+                          }
+                        })
+                        $('#addartistModal').modal('hide');
                      }
                 })
         })

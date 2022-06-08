@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Song listing DeltaX Task</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+      integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script src="./resources/star-rating-font-awesome/jquery.star-rating.js"></script>
+
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+          <a class="navbar-brand" href="#"><strong>DeltaX Music List</strong> </a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNavAltMarkup"
+            aria-controls="navbarNavAltMarkup"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav ms-auto">
+              <a class="nav-link "  href="/">Home</a>
+              <a class="nav-link active" aria-current="page" href="#">Songs</a>
+              <a class="nav-link" href="/artist">Artists</a>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div class="container mt-3">
+          <h3>All Songs</h3>
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Search" aria-label="Search" id="song_search" aria-describedby="basic-addon2">
+            <span class="input-group-text" id="basic-addon2"><i class="fa-solid fa-magnifying-glass"></i></span>
+          </div>
+          <table class="table table-bordered mt-3 align-middle" id="songs_tbl" >
+              <thead >
+                <tr>
+                    <th>Cover</th>
+                    <th>Name</th>
+                    <th>Release Date</th>
+                    <th>Artists</th>
+                    <th>AVG Rating</th>
+                    <th>Rating</th>
+                    <th colspan="2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+
+              </tbody>
+          </table>
+      </div>
+
+      <script>
+        $("body").on("click", "#editbtn", function(){
+          var song_id = $(this).parents("tr").attr('data-id')
+          var song_rating = $(this).parents("tr").attr('data-rating')  
+          $(this).parents("tr").find("td:eq(5)").html('<input class="form-control" type="number" max="5" min="0" name="edit_rating" value="'+song_rating+'">')
+          $(this).parents("tr").find("td:eq(6)").prepend("<button class='btn btn-info btn-sm btn-update'>Update</button> <button class='btn btn-danger btn-sm btn-cancel'>Cancel</button>")  
+          $(this).hide(); 
+
+        })
+        $("body").on("click", ".btn-cancel", function(){  
+                var song_id = $(this).parents("tr").attr('data-id');  
+                var song_rating = $(this).parents("tr").attr('data-rating'); 
+
+                $(this).parents("tr").find("td:eq(5)").text(song_rating);  
+
+                $(this).parents("tr").find("#editbtn").show();   
+                $(this).parents("tr").find(".btn-update").remove();  
+                $(this).parents("tr").find(".btn-cancel").remove(); 
+                $( "#song_tbl" ).load( "songs #song_tbl" ); 
+            });  
+            
+            $("body").on("click", ".btn-update", function(){  
+                var song_id = $(this).parents("tr").attr('data-id');  
+                var song_rating = $(this).parents("tr").find("input[name='edit_rating']").val();
+
+                $(this).parents("tr").find("td:eq(5)").text(song_rating);  
+
+                $(this).parents("tr").attr('data-id', song_id);  
+                $(this).parents("tr").attr('data-rating', song_rating); 
+                var data = {"song_id": song_id, "song_rating": song_rating}
+                console.log(data)
+                $.ajax({
+                        url: '/update/rating',
+                        type: 'POST',
+                        data: data,
+                        success: function(data) {
+                            $( "#song_tbl" ).load( "songs #song_tbl" );
+                            //location.reload();
+                        }
+                    });
+                $(this).parents("tr").find("#editbtn").show();  
+                $(this).parents("tr").find(".btn-cancel").remove();  
+                $(this).parents("tr").find(".btn-update").remove();  
+                
+                
+            }); 
+          $(document).ready(function () {
+            $.ajax({
+                    url: "/get/songs",
+                    type: 'Get',
+                     success: function(data){
+                        var rows = data.result
+                        var rows2 = data.ratings
+                        var table = $("#songs_tbl tbody");
+                        rows.forEach((elem,index) => {
+                            var img = "./public/uploads/" + elem.song_poster
+                            if(rows2[index] === undefined){
+                              table.append("<tr data-id="+ elem.song_id+" data-rating="+0+"><td><img src="+ img+" alt="+2+" height="+80+"></td><td>"+ elem.song_name +"</td><td>"+ elem.song_release +"</td><td>"+ elem.artists +"</td><td>"+ elem.avgrating +"</td><td class='rating' id='rating_col'>"+0+"</td><td class='noExl'><button class='btn btn-warning btn-sm' id='editbtn' ><i class='fa fa-star'></i> Rate</button></td></tr>")
+                            }else{
+                              if(elem.song_id === rows2[index].song_id){
+                              table.append("<tr data-id="+ elem.song_id+" data-rating="+elem.rating+"><td><img src="+ img+" alt="+2+" height="+80+"></td><td>"+ elem.song_name +"</td><td>"+ elem.song_release +"</td><td>"+ elem.artists +"</td><td>"+ elem.avgrating +"</td><td class='rating' id='rating_col'>"+rows2[index].rating+"</td><td class='noExl'><button class='btn btn-warning btn-sm' id='editbtn' ><i class='fa fa-star'></i> Rate</button></td></tr>")
+                            }else{
+                              table.append("<tr data-id="+ elem.song_id+" data-rating="+0+"><td><img src="+ img+" alt="+2+" height="+80+"></td><td>"+ elem.song_name +"</td><td>"+ elem.song_release +"</td><td>"+ elem.artists +"</td><td>"+ elem.avgrating +"</td><td class='rating' id='rating_col'>"+0+"</td><td class='noExl'><button class='btn btn-warning btn-sm' id='editbtn' ><i class='fa fa-star'></i> Rate</button></td></tr>")
+                            }
+                            }
+                            
+                            });
+                     }
+                })
+                
+            });
+            $(document).ready(function(){
+              $("#song_search").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                $("#songs_tbl tr").filter(function() {
+                  $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+              });
+            });
+            
+      </script>
+
+      <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

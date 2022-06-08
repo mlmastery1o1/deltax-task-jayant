@@ -38,8 +38,8 @@
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
           <div class="navbar-nav ms-auto">
             <a class="nav-link active" aria-current="page" href="#">Home</a>
-            <a class="nav-link" href="#">Songs</a>
-            <a class="nav-link" href="#">Artists</a>
+            <a class="nav-link" href="/songs">Songs</a>
+            <a class="nav-link" href="/artist">Artists</a>
           </div>
         </div>
       </div>
@@ -48,20 +48,11 @@
     <div class="container mt-2">
       <div class="row">
         <div class="col-2">
-          <button
-            type="button"
-            class="btn btn-outline-primary"
-          >
-            Top 10 Songs
-          </button>
+          <a href="#topsongsdiv" type="button" class="btn btn-outline-primary">Top 10 Songs</a>
         </div>
         <div class="col-2">
-          <button
-            type="button"
-            class="btn btn-outline-primary"
-          >
-            Top 10 Artists
-          </button>
+          <a href="#topartistsdiv" type="button" class="btn btn-outline-primary">Top 10 Artists</a>
+          
         </div>
         <div class="col-2 ms-auto">
           <a href="/add_song" class="btn btn-primary"><i class="fa-regular fa-square-plus"></i> Add song</a>
@@ -69,61 +60,133 @@
       </div>
     </div>
 
-    <section class="mt-2" style="background-color: rgb(243, 244, 245)">
+    <section class="mt-2" id="topsongsdiv">
       <div class="container">
         <h2>Top 10 Songs</h2>
       </div>
-      <div class="container-fluid">
-        <table class="table table-striped">
+      <div class="container">
+        <table class="table table-striped table-bordered" id="topsongs">
           <thead>
             <tr>
+              <th>Rank</th>
               <th>Artwork</th>
               <th>Song</th>
               <th>Date release</th>
               <th>Artists</th>
               <th>Rate</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-            </tr>
+
           </tbody>
         </table>
       </div>
     </section>
-    <section class="mt-2">
+    <section class="mt-2" id="topartistsdiv">
       <div class="container">
         <h2>Top 10 Artists</h2>
       </div>
-      <div class="container-fluid">
-        <table class="table table-striped">
+      <div class="container">
+        <table class="table table-striped table-bordered" id="topartist">
           <thead>
             <tr>
-              <th>Artwork</th>
-              <th>Song</th>
-              <th>Date release</th>
-              <th>Artists</th>
-              <th>Rate</th>
+              <th>Artist Name</th>
+              <th>Artist D.O.B</th>
+              <th>Artist Bio</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-            </tr>
+
           </tbody>
         </table>
       </div>
     </section>
-    <script></script>
+    <script>
+      $("body").on("click", "#editbtn", function(){
+          var song_id = $(this).parents("tr").attr('data-id')
+          var song_rating = $(this).parents("tr").attr('data-rating')  
+          $(this).parents("tr").find("td:eq(5)").html('<input class="form-control" type="number" max="5" min="0" name="edit_rating" value="'+song_rating+'">')
+          $(this).parents("tr").find("td:eq(6)").prepend("<button class='btn btn-info btn-sm btn-update'>Update</button> <button class='btn btn-danger btn-sm btn-cancel'>Cancel</button>")  
+          $(this).hide(); 
+
+        })
+        $("body").on("click", ".btn-cancel", function(){  
+                var song_id = $(this).parents("tr").attr('data-id');  
+                var song_rating = $(this).parents("tr").attr('data-rating'); 
+
+                $(this).parents("tr").find("td:eq(5)").text(song_rating);  
+
+                $(this).parents("tr").find("#editbtn").show();   
+                $(this).parents("tr").find(".btn-update").remove();  
+                $(this).parents("tr").find(".btn-cancel").remove(); 
+                $( "#song_tbl" ).load( "songs #song_tbl" ); 
+            });  
+            
+            $("body").on("click", ".btn-update", function(){  
+                var song_id = $(this).parents("tr").attr('data-id');  
+                var song_rating = $(this).parents("tr").find("input[name='edit_rating']").val();
+
+                $(this).parents("tr").find("td:eq(5)").text(song_rating);  
+
+                $(this).parents("tr").attr('data-id', song_id);  
+                $(this).parents("tr").attr('data-rating', song_rating); 
+                var data = {"song_id": song_id, "song_rating": song_rating}
+                console.log(data)
+                $.ajax({
+                        url: '/update/rating',
+                        type: 'POST',
+                        data: data,
+                        success: function(data) {
+                            $( "#song_tbl" ).load( "songs #song_tbl" );
+                            //location.reload();
+                        }
+                    });
+                $(this).parents("tr").find("#editbtn").show();  
+                $(this).parents("tr").find(".btn-cancel").remove();  
+                $(this).parents("tr").find(".btn-update").remove();  
+                
+                
+            }); 
+
+        $(document).ready(function () {
+            $.ajax({
+                    url: "/get/topsongs",
+                    type: 'Get',
+                     success: function(data){
+                        var rows = data.result
+                        var artist_name = data.artists
+                        var table = $("#topsongs tbody");
+                        var rank = 1
+                        console.log(rows)
+                        for(let x in artist_name){
+                          elem = rows[x]
+                          var img = "./public/uploads/" + elem.song_poster
+                          table.append("<tr data-id="+ elem.song_id+" data-rating="+elem.avgrating+"><td>"+ rank+"</td><td><img src="+ img+" alt="+2+" height="+80+"></td><td>"+ elem.song_name +"</td><td>"+ elem.song_release +"</td><td>"+ artist_name[x] +"</td><td class='rating' id='rating_col'>"+elem.avgrating+"</td><td class='noExl'><button class='btn btn-warning btn-sm' id='editbtn' ><i class='fa fa-star'></i> Rate</button></td></tr>")
+                          rank +=1
+                        }
+                        
+                     }
+                })     
+            
+              });
+
+            $(document).ready(function () {
+            $.ajax({
+                    url: "/get/topartist",
+                    type: 'Get',
+                     success: function(data){
+                        var rows = data.result
+                        var table = $("#topartist tbody");
+                        rows.forEach((elem, idx) => {
+                          table.append("<tr><td>"+ (idx+1) +"</td><td>"+ elem.artist_name +"</td><td>"+ elem.artist_dob +"</td><td>"+ elem.artist_bio +"</td></tr>")
+                        });
+                        
+                     }
+                })
+                
+            });
+    </script>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
